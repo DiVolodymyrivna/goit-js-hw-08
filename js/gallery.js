@@ -63,28 +63,44 @@ const images = [
       description: "Lighthouse Coast Sea",
     },
   ];
-  const galleryList = document.querySelector('.gallery');
+  
+  const galleryList = document.querySelector('ul.gallery');
 
-  function createGallery(images) {
-    const galleryItems = images.map(image => {
+  const galleryMarkup = images.map(image => `
+  <li class="gallery-item" 
+    < class="gallery-link" href="${image.original}">
+    <img 
+      class="gallery-image"
+      src="${image.preview}"
+      data-source="${image.original}"
+      alt="${image.description}"
+      />
+    </a>
+  `).join('');
+  
+  galleryList.innerHTML = galleryMarkup;
+  
 
-      const listItem = document.createElement('li');
-      listItem.classList.add('gallery-item');
-
-      const link = document.createElement('a');
-      link.classList.add('gallery-link');
-      link.href = image.original;
+  galleryList.addEventListener("click", (event) => {
+    event.preventDefault();
       
-      const imageElement = document.createElement('img');
-      imageElement.classList.add('gallery-image');
-      imageElement.src = image.preview;
-      imageElement.alt = image.description;
-      imageElement.dataset.source = image.original;
-      link.appendChild(imageElement);
-      listItem.appendChild(link);
-      return listItem;
-    });
-    galleryList.append(...galleryItems);
-  }
-
-  createGallery(images);
+    const myModal = basicLightbox.create(
+      `<img src=${event.target.dataset.source} />`, {
+      onShow: (myModal) => console.log('onShow', myModal),
+      onClose: (myModal) => console.log('onClose', myModal)})
+      
+      myModal.show((myModal) => console.log('finished show()', myModal))
+  
+      setTimeout(() => {
+        myModal.close((myModal) => console.log('finished close()', myModal))
+      }, 3000)
+  
+  
+    document.addEventListener('keydown', function(e) {
+      if (e.code === 'Escape') {
+        myModal.close();
+        document.removeEventListener('keydown', e); 
+      }
+      });
+  });
+  
