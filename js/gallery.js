@@ -65,42 +65,54 @@ const images = [
   ];
   
   const galleryList = document.querySelector('ul.gallery');
+const modal = basicLightbox.create('', {
+  onShow: (instance) => console.log('onShow', instance),
+  onClose: (instance) => console.log('onClose', instance)
+});
 
-  const galleryMarkup = images.map(image => `
-  <li class="gallery-item" 
-    < class="gallery-link" href="${image.original}">
-    <img 
-      class="gallery-image"
-      src="${image.preview}"
-      data-source="${image.original}"
-      alt="${image.description}"
+const galleryMarkup = images.map(image => `
+  <li class="gallery-item">
+    <a class="gallery-link" href="${image.original}">
+      <img
+        class="gallery-image"
+        src="${image.preview}"
+        data-source="${image.original}"
+        alt="${image.description || 'Image'}" 
       />
     </a>
-  `).join('');
-  
-  galleryList.innerHTML = galleryMarkup;
-  
+  </li>
+`).join('');
 
-  galleryList.addEventListener("click", (event) => {
-    event.preventDefault();
-      
-    const myModal = basicLightbox.create(
-      `<img src=${event.target.dataset.source} />`, {
-      onShow: (myModal) => console.log('onShow', myModal),
-      onClose: (myModal) => console.log('onClose', myModal)})
-      
-      myModal.show((myModal) => console.log('finished show()', myModal))
-  
-      setTimeout(() => {
-        myModal.close((myModal) => console.log('finished close()', myModal))
-      }, 3000)
-  
-  
-    document.addEventListener('keydown', function(e) {
-      if (e.code === 'Escape') {
-        myModal.close();
-        document.removeEventListener('keydown', e); 
-      }
-      });
-  });
-  
+galleryList.innerHTML = galleryMarkup;
+
+const openModal = (source) => {
+  modal.element().innerHTML = `<img src="${source}"alt="Expanded Image"
+  width="1112" height="640" /> `;
+  modal.show();
+
+  const keydownHandler = (e) => {
+    if (e.code === 'Escape') {
+      modal.close();
+      document.removeEventListener('keydown', keydownHandler);
+    }
+  };
+
+  document.addEventListener('keydown', keydownHandler);
+};
+
+galleryList.addEventListener("click", (event) => {
+  event.preventDefault();
+
+  const clickedImageSource = event.target.dataset.source;
+  if (clickedImageSource) {
+    openModal(clickedImageSource);
+  }
+});
+
+// Закриття модального вікна при кліку на саме зображення
+modal.element().addEventListener('click', (event) => {
+  if (event.target.nodeName === 'IMG') {
+    modal.close();
+    document.removeEventListener('keydown', keydownHandler);
+  }
+});
