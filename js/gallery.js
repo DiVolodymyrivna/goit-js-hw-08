@@ -63,7 +63,6 @@ const images = [
       description: "Lighthouse Coast Sea",
     },
   ];
-  
   const galleryList = document.querySelector('ul.gallery');
 const modal = basicLightbox.create('', {
   onShow: (instance) => console.log('onShow', instance),
@@ -85,11 +84,6 @@ const galleryMarkup = images.map(image => `
 
 galleryList.innerHTML = galleryMarkup;
 
-const openModal = (source) => {
-  modal.element().innerHTML = `<img src="${source}"alt="Expanded Image"
-  width="1112" height="640" /> `;
-  modal.show();
-
   const keydownHandler = (e) => {
     if (e.code === 'Escape') {
       modal.close();
@@ -97,22 +91,38 @@ const openModal = (source) => {
     }
   };
 
+  const openModal = (source) => {
+    modal.element().innerHTML = `<img src="${source}"alt="Expanded Image"
+    width="1112" height="640" /> `;
+    modal.show();
+  };
+
+
+  // Додаємо обробник подій при відкритті модального вікна
+
   document.addEventListener('keydown', keydownHandler);
+
+// ----
+
+
+const closeModal = () => {
+  modal.close();
+  document.removeEventListener('keydown', keydownHandler);
 };
 
-galleryList.addEventListener("click", (event) => {
-  event.preventDefault();
-
-  const clickedImageSource = event.target.dataset.source;
-  if (clickedImageSource) {
-    openModal(clickedImageSource);
-  }
-});
 
 // Закриття модального вікна при кліку на саме зображення
 modal.element().addEventListener('click', (event) => {
   if (event.target.nodeName === 'IMG') {
-    modal.close();
-    document.removeEventListener('keydown', keydownHandler);
+    closeModal();
+  }
+});
+
+galleryList.addEventListener("click", (event) => {
+  event.preventDefault();
+
+const clickedImageSource = event.target.dataset.source;
+  if (clickedImageSource) {
+    openModal(clickedImageSource);
   }
 });
