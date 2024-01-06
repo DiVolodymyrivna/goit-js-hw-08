@@ -65,8 +65,8 @@ const images = [
   ];
   const galleryList = document.querySelector('ul.gallery');
 const modal = basicLightbox.create('', {
-  onShow: (instance) => console.log('onShow', instance),
-  onClose: (instance) => console.log('onClose', instance)
+  onShow: () => {document.addEventListener('keydown', keydownHandler)},
+  onClose: () => {document.removeEventListener('keydown', keydownHandler)}
 });
 
 const galleryMarkup = images.map(image => `
@@ -84,13 +84,15 @@ const galleryMarkup = images.map(image => `
 
 galleryList.innerHTML = galleryMarkup;
 
-  const keydownHandler = (e) => {
-    if (e.code === 'Escape') {
-      modal.close();
-      document.removeEventListener('keydown', keydownHandler);
-    }
-  };
+const keydownHandler = function(e) {
+  if (e.code === 'Escape') {
+    modal.close();
+  }
+};
 
+
+
+  
   const openModal = (source) => {
     modal.element().innerHTML = `<img src="${source}"alt="Expanded Image"
     width="1112" height="640" /> `;
@@ -98,16 +100,9 @@ galleryList.innerHTML = galleryMarkup;
   };
 
 
-  // Додаємо обробник подій при відкритті модального вікна
-
-  document.addEventListener('keydown', keydownHandler);
-
-// ----
-
 
 const closeModal = () => {
   modal.close();
-  document.removeEventListener('keydown', keydownHandler);
 };
 
 
@@ -126,3 +121,7 @@ const clickedImageSource = event.target.dataset.source;
     openModal(clickedImageSource);
   }
 });
+
+// Додавання слухача подій клавіш на документі
+
+document.addEventListener('keydown', keydownHandler);
