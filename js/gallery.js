@@ -63,12 +63,55 @@ const images = [
       description: "Lighthouse Coast Sea",
     },
   ];
-  const galleryList = document.querySelector('ul.gallery');
+  // Отримуємо елемент ul з класом .gallery
+const galleryList = document.querySelector('ul.gallery');
+
+// Створюємо модальне вікно
 const modal = basicLightbox.create('', {
-  onShow: () => {document.addEventListener('keydown', keydownHandler)},
-  onClose: () => {document.removeEventListener('keydown', keydownHandler)}
+  onShow: () => { document.addEventListener('keydown', keydownHandler); },
+  onClose: () => { document.removeEventListener('keydown', keydownHandler); }
 });
 
+// Функція для обробки подій натискання клавіш
+const keydownHandler = function(e) {
+  if (e.code === 'Escape') {
+    modal.close();
+  }
+};
+
+// Функція для відкриття модального вікна зображення
+const openModal = (source) => {
+  const content = `<img src="${source}" alt="Expanded Image" width="1112" height="640" />`;
+  modal.element().innerHTML = content;
+  modal.show();
+};
+
+// Функція для закриття модального вікна
+const closeModal = () => {
+  modal.close();
+};
+
+// Обробник подій кліку на зображенні для відкриття модального вікна
+modal.element().addEventListener('click', (event) => {
+  if (event.target.nodeName === 'IMG') {
+    closeModal();
+  }
+});
+
+// Обробник подій кліку на зображенні галереї
+galleryList.addEventListener("click", (event) => {
+  event.preventDefault();
+  const clickedGalleryItem = event.target.closest('.gallery-item');
+  if (clickedGalleryItem) {
+    const clickedImage = clickedGalleryItem.querySelector('.gallery-image');
+    const clickedImageSource = clickedImage.dataset.source;
+    if (clickedImageSource) {
+      openModal(clickedImageSource);
+    }
+  }
+});
+
+// Створення розмітки для галереї зображень
 const galleryMarkup = images.map(image => `
   <li class="gallery-item">
     <a class="gallery-link" href="${image.original}">
@@ -82,46 +125,5 @@ const galleryMarkup = images.map(image => `
   </li>
 `).join('');
 
+// Додавання згенерованої розмітки до елементу ul з класом .gallery
 galleryList.innerHTML = galleryMarkup;
-
-const keydownHandler = function(e) {
-  if (e.code === 'Escape') {
-    modal.close();
-  }
-};
-
-
-
-  
-  const openModal = (source) => {
-    modal.element().innerHTML = `<img src="${source}"alt="Expanded Image"
-    width="1112" height="640" /> `;
-    modal.show();
-  };
-
-
-
-const closeModal = () => {
-  modal.close();
-};
-
-
-// Закриття модального вікна при кліку на саме зображення
-modal.element().addEventListener('click', (event) => {
-  if (event.target.nodeName === 'IMG') {
-    closeModal();
-  }
-});
-
-galleryList.addEventListener("click", (event) => {
-  event.preventDefault();
-
-const clickedImageSource = event.target.dataset.source;
-  if (clickedImageSource) {
-    openModal(clickedImageSource);
-  }
-});
-
-// Додавання слухача подій клавіш на документі
-
-document.addEventListener('keydown', keydownHandler);
