@@ -66,8 +66,27 @@ const images = [
   // Отримуємо елемент ul з класом .gallery
 const galleryList = document.querySelector('ul.gallery');
 
+// Створення розмітки для галереї зображень
+const galleryMarkup = images.map(image => `
+  <li class="gallery-item">
+    <a class="gallery-link" href="${image.original}">
+      <img
+        class="gallery-image"
+        src="${image.preview}"
+        data-source="${image.original}"
+        alt="${image.description || 'Image'}" 
+      />
+    </a>
+  </li>
+`).join('');
+
+// Додавання згенерованої розмітки до елементу ul з класом .gallery
+galleryList.innerHTML = galleryMarkup;
+
 // Створюємо модальне вікно
-const modal = basicLightbox.create('', {
+const modal = basicLightbox.create(`
+  <img src="" alt="" />
+`, {
   onShow: () => { document.addEventListener('keydown', keydownHandler); },
   onClose: () => { document.removeEventListener('keydown', keydownHandler); }
 });
@@ -91,6 +110,9 @@ const closeModal = () => {
   modal.close();
 };
 
+
+
+
 // Обробник подій кліку на зображенні для відкриття модального вікна
 modal.element().addEventListener('click', (event) => {
   if (event.target.nodeName === 'IMG') {
@@ -111,19 +133,3 @@ galleryList.addEventListener("click", (event) => {
   }
 });
 
-// Створення розмітки для галереї зображень
-const galleryMarkup = images.map(image => `
-  <li class="gallery-item">
-    <a class="gallery-link" href="${image.original}">
-      <img
-        class="gallery-image"
-        src="${image.preview}"
-        data-source="${image.original}"
-        alt="${image.description || 'Image'}" 
-      />
-    </a>
-  </li>
-`).join('');
-
-// Додавання згенерованої розмітки до елементу ul з класом .gallery
-galleryList.innerHTML = galleryMarkup;
